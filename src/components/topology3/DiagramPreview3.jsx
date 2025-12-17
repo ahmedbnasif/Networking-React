@@ -52,26 +52,236 @@ const DiagramPreview3 = ({
   const handleShowEndpointsRef = useRef();
   const updateFlowLinesRef = useRef();
 
-  const updateFlowLines = useCallback(() => {
-    // clear existing lines safely
-    Object.values(linesRef.current).forEach((arr) => {
-      if (Array.isArray(arr)) {
-        arr.forEach((line) => {
-          if (line && typeof line.remove === 'function') {
-            try {
-              line.remove();
-            } catch (error) {
-              console.warn('Error removing line:', error);
-            }
-          }
-        });
-      }
-    });
-    linesRef.current = {};
+  // const updateFlowLines = useCallback(() => {
+  //   // clear existing lines safely
+  //   Object.values(linesRef.current).forEach((arr) => {
+  //     if (Array.isArray(arr)) {
+  //       arr.forEach((line) => {
+  //         if (line && typeof line.remove === 'function') {
+  //           try {
+  //             line.remove();
+  //           } catch (error) {
+  //             console.warn('Error removing line:', error);
+  //           }
+  //         }
+  //       });
+  //     }
+  //   });
+  //   linesRef.current = {};
 
-    // Double RAF to ensure DOM is fully painted AND elements exist
+  //   // Double RAF to ensure DOM is fully painted AND elements exist
+  //   window.requestAnimationFrame(() => {
+  //     window.requestAnimationFrame(() => {
+  //       Object.keys(connectionMap).forEach((key) => {
+  //         if (flowCheckboxes[key]) {
+  //           linesRef.current[key] = connectionMap[key].map(([s, e, opts = {}]) => {
+  //             const startEl = document.getElementById(s);
+  //             const endEl = document.getElementById(e);
+              
+  //             // Only create line if both elements exist
+  //             if (startEl && endEl) {
+  //               try {
+  //                 return createLeaderLine(s, e, opts);
+  //               } catch (error) {
+  //                 console.warn(`Error creating line from ${s} to ${e}:`, error);
+  //                 return null;
+  //               }
+  //             } else {
+  //               console.warn(`Elements not found for line: ${s} -> ${e}`);
+  //               return null;
+  //             }
+  //           }).filter(line => line !== null); // Remove null entries
+  //         }
+  //       });
+  //     });
+  //   });
+
+  //   // popups "updated" flags
+  //   const affectedPopups = {};
+  //   if (flowCheckboxes["chk-fw1-inet1"] || flowCheckboxes["chk-priv1-inet1-fw"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup17 = true;
+  //   }
+  //   if (flowCheckboxes["chk-inet1-pub1"] || flowCheckboxes["chk-pub1-inet1"]) {
+  //     affectedPopups.popup6 = true;
+  //   }
+  //   if (flowCheckboxes["chk-priv1-inet1-bypass-fw"]) {
+  //     affectedPopups.popup5 = true;
+  //   }
+  //   if (flowCheckboxes["chk-priv2-inet1"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup7 = true;
+  //     affectedPopups.popup10 = true;
+  //     affectedPopups.popup12 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //   }
+  //   if (flowCheckboxes["chk-priv3-inet1"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup8 = true;
+  //     affectedPopups.popup10 = true;
+  //     affectedPopups.popup13 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //   }
+  //   if (
+  //     flowCheckboxes["chk-pub1-priv2"] ||
+  //     flowCheckboxes["chk-priv2-pub1"] ||
+  //     flowCheckboxes["chk-priv1-priv2"] ||
+  //     flowCheckboxes["chk-priv2-priv1"]
+  //   ) {
+  //     affectedPopups.popup5 = true;
+  //     if (flowCheckboxes["chk-pub1-priv2"] || flowCheckboxes["chk-priv2-pub1"]) {
+  //       affectedPopups.popup6 = true;
+  //     }
+  //     affectedPopups.popup7 = true;
+  //     affectedPopups.popup12 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //     if (flowCheckboxes["chk-priv1-priv2"] || flowCheckboxes["chk-priv2-priv1"]) {
+  //       affectedPopups.popup17 = true;
+  //     }
+  //   }
+  //   if (
+  //     flowCheckboxes["chk-pub1-priv3"] ||
+  //     flowCheckboxes["chk-priv3-pub1"] ||
+  //     flowCheckboxes["chk-priv1-priv3"] ||
+  //     flowCheckboxes["chk-priv3-priv1"]
+  //   ) {
+  //     affectedPopups.popup5 = true;
+  //     if (flowCheckboxes["chk-pub1-priv3"] || flowCheckboxes["chk-priv3-pub1"]) {
+  //       affectedPopups.popup6 = true;
+  //     }
+  //     affectedPopups.popup8 = true;
+  //     affectedPopups.popup13 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //     if (flowCheckboxes["chk-priv1-priv3"] || flowCheckboxes["chk-priv3-priv1"]) {
+  //       affectedPopups.popup17 = true;
+  //     }
+  //   }
+  //   if (flowCheckboxes["chk-priv2-priv3"] || flowCheckboxes["chk-priv3-priv2"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup7 = true;
+  //     affectedPopups.popup8 = true;
+  //     affectedPopups.popup12 = true;
+  //     affectedPopups.popup13 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //   }
+  //   if (flowCheckboxes["chk-pub1-db1"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup6 = true;
+  //   }
+  //   if (flowCheckboxes["chk-priv3-db1"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup8 = true;
+  //     affectedPopups.popup11 = true;
+  //     affectedPopups.popup13 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //   }
+  //   if (flowCheckboxes["chk-priv2-db1"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup7 = true;
+  //     affectedPopups.popup11 = true;
+  //     affectedPopups.popup12 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //   }
+  //   if (flowCheckboxes["chk-priv1-db1"]) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup17 = true;
+  //   }
+  //   if(
+  //     flowCheckboxes["chk-op1-fw1-priv1"] ||
+  //     flowCheckboxes["chk-priv1-fw1-op1"]   
+  //   )
+  //   {    
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //     affectedPopups.popup17 = true;
+  //     affectedPopups.popup18 = true;
+  //     affectedPopups.popup19 = true;
+  //     affectedPopups.popup20 = true;
+  //   }
+  //   if (
+  //     flowCheckboxes["chk-op1-pub1"] ||
+  //     flowCheckboxes["chk-pub1-op1"]
+  //   ) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup6 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //     affectedPopups.popup18 = true;
+  //     affectedPopups.popup19 = true;
+  //     affectedPopups.popup20 = true;
+  //   }
+  //   if (
+  //     flowCheckboxes["chk-op1-priv2"] ||
+  //     flowCheckboxes["chk-priv2-op1"]
+  //   ) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup7 = true;
+  //     affectedPopups.popup12 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //     affectedPopups.popup18 = true;
+  //     affectedPopups.popup19 = true;
+  //     affectedPopups.popup20 = true;
+  //   }
+  //   if (
+  //     flowCheckboxes["chk-op1-priv3"] ||
+  //     flowCheckboxes["chk-priv3-op1"]
+  //   ) {
+  //     affectedPopups.popup5 = true;
+  //     affectedPopups.popup8 = true;
+  //     affectedPopups.popup13 = true;
+  //     affectedPopups.popup14 = true;
+  //     affectedPopups.popup15 = true;
+  //     affectedPopups.popup16 = true;
+  //     affectedPopups.popup18 = true;
+  //     affectedPopups.popup19 = true;
+  //     affectedPopups.popup20 = true;
+  //   }
+  //   setUpdatedPopups(affectedPopups);
+  // }, [flowCheckboxes]);
+
+
+
+
+  const updateFlowLines = useCallback(() => {
+  // clear existing lines safely
+  Object.values(linesRef.current).forEach((arr) => {
+    if (Array.isArray(arr)) {
+      arr.forEach((line) => {
+        if (line && typeof line.remove === 'function') {
+          try {
+            line.remove();
+          } catch (error) {
+            console.warn('Error removing line:', error);
+          }
+        }
+      });
+    }
+  });
+  linesRef.current = {};
+
+  // Triple RAF + small timeout to ensure DOM is fully painted AND positioned
+  window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
+      setTimeout(() => {
         Object.keys(connectionMap).forEach((key) => {
           if (flowCheckboxes[key]) {
             linesRef.current[key] = connectionMap[key].map(([s, e, opts = {}]) => {
@@ -93,170 +303,173 @@ const DiagramPreview3 = ({
             }).filter(line => line !== null); // Remove null entries
           }
         });
-      });
+      }, 50); // Small 50ms delay after double RAF
     });
+  });
 
-    // popups "updated" flags
-    const affectedPopups = {};
-    if (flowCheckboxes["chk-fw1-inet1"] || flowCheckboxes["chk-priv1-inet1-fw"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup17 = true;
-    }
-    if (flowCheckboxes["chk-inet1-pub1"] || flowCheckboxes["chk-pub1-inet1"]) {
+  // popups "updated" flags
+  const affectedPopups = {};
+  if (flowCheckboxes["chk-fw1-inet1"] || flowCheckboxes["chk-priv1-inet1-fw"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup17 = true;
+  }
+  if (flowCheckboxes["chk-inet1-pub1"] || flowCheckboxes["chk-pub1-inet1"]) {
+    affectedPopups.popup6 = true;
+  }
+  if (flowCheckboxes["chk-priv1-inet1-bypass-fw"]) {
+    affectedPopups.popup5 = true;
+  }
+  if (flowCheckboxes["chk-priv2-inet1"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup7 = true;
+    affectedPopups.popup10 = true;
+    affectedPopups.popup12 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+  }
+  if (flowCheckboxes["chk-priv3-inet1"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup8 = true;
+    affectedPopups.popup10 = true;
+    affectedPopups.popup13 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+  }
+  if (
+    flowCheckboxes["chk-pub1-priv2"] ||
+    flowCheckboxes["chk-priv2-pub1"] ||
+    flowCheckboxes["chk-priv1-priv2"] ||
+    flowCheckboxes["chk-priv2-priv1"]
+  ) {
+    affectedPopups.popup5 = true;
+    if (flowCheckboxes["chk-pub1-priv2"] || flowCheckboxes["chk-priv2-pub1"]) {
       affectedPopups.popup6 = true;
     }
-    if (flowCheckboxes["chk-priv1-inet1-bypass-fw"]) {
-      affectedPopups.popup5 = true;
-    }
-    if (flowCheckboxes["chk-priv2-inet1"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup7 = true;
-      affectedPopups.popup10 = true;
-      affectedPopups.popup12 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-    }
-    if (flowCheckboxes["chk-priv3-inet1"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup8 = true;
-      affectedPopups.popup10 = true;
-      affectedPopups.popup13 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-    }
-    if (
-      flowCheckboxes["chk-pub1-priv2"] ||
-      flowCheckboxes["chk-priv2-pub1"] ||
-      flowCheckboxes["chk-priv1-priv2"] ||
-      flowCheckboxes["chk-priv2-priv1"]
-    ) {
-      affectedPopups.popup5 = true;
-      if (flowCheckboxes["chk-pub1-priv2"] || flowCheckboxes["chk-priv2-pub1"]) {
-        affectedPopups.popup6 = true;
-      }
-      affectedPopups.popup7 = true;
-      affectedPopups.popup12 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-      if (flowCheckboxes["chk-priv1-priv2"] || flowCheckboxes["chk-priv2-priv1"]) {
-        affectedPopups.popup17 = true;
-      }
-    }
-    if (
-      flowCheckboxes["chk-pub1-priv3"] ||
-      flowCheckboxes["chk-priv3-pub1"] ||
-      flowCheckboxes["chk-priv1-priv3"] ||
-      flowCheckboxes["chk-priv3-priv1"]
-    ) {
-      affectedPopups.popup5 = true;
-      if (flowCheckboxes["chk-pub1-priv3"] || flowCheckboxes["chk-priv3-pub1"]) {
-        affectedPopups.popup6 = true;
-      }
-      affectedPopups.popup8 = true;
-      affectedPopups.popup13 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-      if (flowCheckboxes["chk-priv1-priv3"] || flowCheckboxes["chk-priv3-priv1"]) {
-        affectedPopups.popup17 = true;
-      }
-    }
-    if (flowCheckboxes["chk-priv2-priv3"] || flowCheckboxes["chk-priv3-priv2"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup7 = true;
-      affectedPopups.popup8 = true;
-      affectedPopups.popup12 = true;
-      affectedPopups.popup13 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-    }
-    if (flowCheckboxes["chk-pub1-db1"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup6 = true;
-    }
-    if (flowCheckboxes["chk-priv3-db1"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup8 = true;
-      affectedPopups.popup11 = true;
-      affectedPopups.popup13 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-    }
-    if (flowCheckboxes["chk-priv2-db1"]) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup7 = true;
-      affectedPopups.popup11 = true;
-      affectedPopups.popup12 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-    }
-    if (flowCheckboxes["chk-priv1-db1"]) {
-      affectedPopups.popup5 = true;
+    affectedPopups.popup7 = true;
+    affectedPopups.popup12 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+    if (flowCheckboxes["chk-priv1-priv2"] || flowCheckboxes["chk-priv2-priv1"]) {
       affectedPopups.popup17 = true;
     }
-    if(
-      flowCheckboxes["chk-op1-fw1-priv1"] ||
-      flowCheckboxes["chk-priv1-fw1-op1"]   
-    )
-    {    
-      affectedPopups.popup5 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-      affectedPopups.popup17 = true;
-      affectedPopups.popup18 = true;
-      affectedPopups.popup19 = true;
-      affectedPopups.popup20 = true;
-    }
-    if (
-      flowCheckboxes["chk-op1-pub1"] ||
-      flowCheckboxes["chk-pub1-op1"]
-    ) {
-      affectedPopups.popup5 = true;
+  }
+  if (
+    flowCheckboxes["chk-pub1-priv3"] ||
+    flowCheckboxes["chk-priv3-pub1"] ||
+    flowCheckboxes["chk-priv1-priv3"] ||
+    flowCheckboxes["chk-priv3-priv1"]
+  ) {
+    affectedPopups.popup5 = true;
+    if (flowCheckboxes["chk-pub1-priv3"] || flowCheckboxes["chk-priv3-pub1"]) {
       affectedPopups.popup6 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-      affectedPopups.popup18 = true;
-      affectedPopups.popup19 = true;
-      affectedPopups.popup20 = true;
     }
-    if (
-      flowCheckboxes["chk-op1-priv2"] ||
-      flowCheckboxes["chk-priv2-op1"]
-    ) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup7 = true;
-      affectedPopups.popup12 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-      affectedPopups.popup18 = true;
-      affectedPopups.popup19 = true;
-      affectedPopups.popup20 = true;
+    affectedPopups.popup8 = true;
+    affectedPopups.popup13 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+    if (flowCheckboxes["chk-priv1-priv3"] || flowCheckboxes["chk-priv3-priv1"]) {
+      affectedPopups.popup17 = true;
     }
-    if (
-      flowCheckboxes["chk-op1-priv3"] ||
-      flowCheckboxes["chk-priv3-op1"]
-    ) {
-      affectedPopups.popup5 = true;
-      affectedPopups.popup8 = true;
-      affectedPopups.popup13 = true;
-      affectedPopups.popup14 = true;
-      affectedPopups.popup15 = true;
-      affectedPopups.popup16 = true;
-      affectedPopups.popup18 = true;
-      affectedPopups.popup19 = true;
-      affectedPopups.popup20 = true;
-    }
-    setUpdatedPopups(affectedPopups);
-  }, [flowCheckboxes]);
+  }
+  if (flowCheckboxes["chk-priv2-priv3"] || flowCheckboxes["chk-priv3-priv2"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup7 = true;
+    affectedPopups.popup8 = true;
+    affectedPopups.popup12 = true;
+    affectedPopups.popup13 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+  }
+  if (flowCheckboxes["chk-pub1-db1"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup6 = true;
+  }
+  if (flowCheckboxes["chk-priv3-db1"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup8 = true;
+    affectedPopups.popup11 = true;
+    affectedPopups.popup13 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+  }
+  if (flowCheckboxes["chk-priv2-db1"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup7 = true;
+    affectedPopups.popup11 = true;
+    affectedPopups.popup12 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+  }
+  if (flowCheckboxes["chk-priv1-db1"]) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup17 = true;
+  }
+  if(
+    flowCheckboxes["chk-op1-fw1-priv1"] ||
+    flowCheckboxes["chk-priv1-fw1-op1"]   
+  )
+  {    
+    affectedPopups.popup5 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+    affectedPopups.popup17 = true;
+    affectedPopups.popup18 = true;
+    affectedPopups.popup19 = true;
+    affectedPopups.popup20 = true;
+  }
+  if (
+    flowCheckboxes["chk-op1-pub1"] ||
+    flowCheckboxes["chk-pub1-op1"]
+  ) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup6 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+    affectedPopups.popup18 = true;
+    affectedPopups.popup19 = true;
+    affectedPopups.popup20 = true;
+  }
+  if (
+    flowCheckboxes["chk-op1-priv2"] ||
+    flowCheckboxes["chk-priv2-op1"]
+  ) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup7 = true;
+    affectedPopups.popup12 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+    affectedPopups.popup18 = true;
+    affectedPopups.popup19 = true;
+    affectedPopups.popup20 = true;
+  }
+  if (
+    flowCheckboxes["chk-op1-priv3"] ||
+    flowCheckboxes["chk-priv3-op1"]
+  ) {
+    affectedPopups.popup5 = true;
+    affectedPopups.popup8 = true;
+    affectedPopups.popup13 = true;
+    affectedPopups.popup14 = true;
+    affectedPopups.popup15 = true;
+    affectedPopups.popup16 = true;
+    affectedPopups.popup18 = true;
+    affectedPopups.popup19 = true;
+    affectedPopups.popup20 = true;
+  }
+  setUpdatedPopups(affectedPopups);
+}, [flowCheckboxes]);
+
+
 
   // Show/hide endpoints + ensure state reset when hiding
   const handleShowEndpoints = useCallback(() => {
